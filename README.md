@@ -9,7 +9,7 @@ An easy-to-use collection of MS Build tasks to help improve your build process.
 
 Tasks
 ===
- - **StartWebProjectTask**: when you need to start some one of your web projects during the build process (usefull to generate some client library for your web apis).
+ - **StartWebProjectTask**: when you need to start some one of your web projects during the build process (useful to generate some client library for your web apis).
  
 --------
 
