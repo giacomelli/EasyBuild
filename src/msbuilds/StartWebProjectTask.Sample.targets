@@ -1,0 +1,10 @@
+<Project ToolsVersion="4.0" DefaultTargets="BeforeBuild" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <UsingTask TaskName="StartWebProjectTask" 
+        AssemblyFile="..\EasyBuild\bin\Debug\EasyBuild.dll"/>
+    
+    	<Target Name="BeforeBuild">
+    		<Message text="Starting StartWebProjectTask..." />
+    		<StartWebProjectTask projectFolderName="EasyBuild.WebSample" port="8181" />
+    		<Message text="StartWebProjectTask done." />
+	</Target>
+</Project>
