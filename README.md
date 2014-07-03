@@ -9,7 +9,7 @@ An easy-to-use collection of MS Build tasks to help improve your build process.
 
 Tasks
 ===
- - **StartWebProjectTask**: when you need to start some one of your web projects during the build process (usefull when you need to generate some client library for your web apis).
+ - **StartWebProjectTask**: when you need to start some one of your web projects during the build process (usefull to generate some client library for your web apis).
  
 --------
 
@@ -24,7 +24,7 @@ Create a file called StartMyWebProject.targets on your msbuilds file folder (if 
 ```xml
 <Project ToolsVersion="4.0" DefaultTargets="BeforeBuild" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
     <UsingTask TaskName="StartWebProjectTask" 
-        AssemblyFile="..\EasyBuild\bin\Debug\EasyBuild.dll"/>
+        AssemblyFile="..\references\EasyBuild\EasyBuild.dll"/>
     
     	<Target Name="BeforeBuild">
     		<Message text="Starting MyWebProject..." />
@@ -35,14 +35,14 @@ Create a file called StartMyWebProject.targets on your msbuilds file folder (if 
 
 ```
 
-Edit the project file that you want use the task, and add the follow line bellow "Microsoft.CSharp.targets" line:
+Edit the target project file that you want use the task, and add the following line bellow the "Microsoft.CSharp.targets" one:
 
 ```xml
 <Import Project="..\msbuilds\StartMyWebProject.targets" />
 
 ```
 
-Build your project and the web project should be started before the project build.
+Build your project and the web project (MyWebProject) should be started before the target project build.
 
 --------
 
