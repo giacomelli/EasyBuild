@@ -5,5 +5,5 @@ install:
   - mozroots --import --sync
  
 script:
-  - xbuild ./src/EasyBuild.sln /property:"Configuration=Debug;Platform=Any CPU"
+  - xbuild ./src/EasyBuild.sln /property:"Configuration=Debug;Platform=Any CPU" /p:"DefineConstants=TRAVIS_CI"
   
