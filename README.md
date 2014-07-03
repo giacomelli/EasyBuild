@@ -54,6 +54,7 @@ Having troubles?
 Roadmap
 -------- 
  - Add others tasks.
+ - Publish a NuGet package.
  
 --------
 
@@ -61,7 +62,6 @@ How to improve it?
 ======
 
 - Create a fork of [EasyBuild](https://github.com/giacomelli/EasyBuild/fork). 
-- Follow our [develoment guidelines](https://github.com/giacomelli/EasyBuild/wiki/Development-Guidelines).
 - Did you change it? [Submit a pull request](https://github.com/giacomelli/EasyBuild/pull/new/master).
 
 
