@@ -119,8 +119,9 @@ namespace EasyBuild
 
             using (var fileStream = new StreamWriter(File.Open(serializationFilename, FileMode.Create, FileAccess.Write), Encoding.UTF8))
             {
-                ForEachResource((rt, rm) =>
+                foreach (var rt in m_resourceTypes)
                 {
+                    var rm = new ResourceManager(rt);
                     var normalizedResourceName = NormalizePropertyName(rt.Name);
                     fileStream.WriteLine("globalization.{0} = {{", normalizedResourceName);
 
@@ -147,9 +148,9 @@ namespace EasyBuild
                     }
 
                     fileStream.WriteLine("}};", normalizedResourceName);
-                });
+                }
             }
-        }        
+        }
 
         /// <summary>
         /// Normaliza o nome de uma propriedade.
