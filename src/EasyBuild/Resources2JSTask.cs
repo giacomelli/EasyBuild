@@ -1,4 +1,5 @@
-﻿using System;
+﻿#if !TRAVIS_CI
+using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
@@ -119,9 +120,8 @@ namespace EasyBuild
 
             using (var fileStream = new StreamWriter(File.Open(serializationFilename, FileMode.Create, FileAccess.Write), Encoding.UTF8))
             {
-                foreach (var rt in m_resourceTypes)
+                ForEachResource((rt, rm) =>
                 {
-                    var rm = new ResourceManager(rt);
                     var normalizedResourceName = NormalizePropertyName(rt.Name);
                     fileStream.WriteLine("globalization.{0} = {{", normalizedResourceName);
 
@@ -148,7 +148,7 @@ namespace EasyBuild
                     }
 
                     fileStream.WriteLine("}};", normalizedResourceName);
-                }
+                });
             }
         }
 
@@ -187,20 +187,20 @@ namespace EasyBuild
             }
         }
 
-        /////// <summary>
-        /////// Executa a action para cada resource informado pelo usuário da linha de comando.
-        /////// </summary>
-        /////// <param name="action">A ação a ser executada.</param>
-        ////[SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", MessageId = "0")]
-        ////private void ForEachResource(Action<Type, ResourceManager> action)
-        ////{
-        ////    ExceptionHelper.ThrowIfNull("action", action);
+        /// <summary>
+        /// Executa a action para cada resource informado pelo usuário da linha de comando.
+        /// </summary>
+        /// <param name="action">A ação a ser executada.</param>
+        [SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", MessageId = "0")]
+        private void ForEachResource(Action<Type, ResourceManager> action)
+        {
+            ExceptionHelper.ThrowIfNull("action", action);
 
-        ////    foreach (var r in m_resourceTypes)
-        ////    {
-        ////        action(r, new ResourceManager(r));
-        ////    }
-        ////}
+            foreach (var r in m_resourceTypes)
+            {
+                action(r, new ResourceManager(r));
+            }
+        }
 
         /// <summary>
         /// Obtém as propriedades do resource que serão serializadas.
@@ -245,3 +245,4 @@ namespace EasyBuild
         #endregion
     }
 }
+#endif
