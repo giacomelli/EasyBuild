@@ -62,8 +62,8 @@
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <!--<Import Project="..\msbuilds\StartWebProjectTask.Sample.targets" Condition="!$(DefineConstants.Contains('TRAVIS_CI'))" />-->
-  <Import Project="..\msbuilds\Resources2JSTask.Sample.targets" />
+  <Import Project="..\msbuilds\StartWebProjectTask.Sample.targets" Condition="!$(DefineConstants.Contains('TRAVIS_CI'))" />
+  <Import Project="..\msbuilds\Resources2JSTask.Sample.targets" Condition="!$(DefineConstants.Contains('TRAVIS_CI'))" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
