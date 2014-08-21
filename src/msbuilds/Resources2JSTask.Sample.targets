@@ -1,0 +1,16 @@
+<Project ToolsVersion="4.0" DefaultTargets="BeforeBuild" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <UsingTask TaskName="Resources2JSTask" 
+        AssemblyFile="..\EasyBuild\bin\Debug\EasyBuild.dll"/>
+    
+    	<Target Name="AfterBuild">
+    		<Message text="Starting Resources2JSTask..." />
+    		
+    		<Resources2JSTask 
+    			assemblyFileName="..\EasyBuild.LibrarySample\bin\$(configuration)\EasyBuild.LibrarySample.dll" 
+    			SerializationFolder="..\EasyBuild.WebSample\Scripts\Globalization"
+    			CultureCodes="en;pt;es"
+    			IgnoreResourceNames="logs" />
+
+    		<Message text="Resources2JSTask done." />
+	</Target>
+</Project>
