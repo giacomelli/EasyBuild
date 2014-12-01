@@ -1,3 +1,4 @@
 ﻿globalization.texts = {
   'name': 'Name',
-  'person': 'Person'};
+  'person': 'Person',
+  'revision': 'Revision'};

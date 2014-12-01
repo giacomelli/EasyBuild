@@ -9,7 +9,8 @@
     			assemblyFileName="..\EasyBuild.LibrarySample\bin\$(configuration)\EasyBuild.LibrarySample.dll" 
     			SerializationFolder="..\EasyBuild.WebSample\Scripts\Globalization"
     			CultureCodes="en;pt;es"
-    			IgnoreResourceNames="logs" />
+    			IgnoreResourceNames="logs"
+					HtmlEncodeEnabled="false" />
 
     		<Message text="Resources2JSTask done." />
 	</Target>

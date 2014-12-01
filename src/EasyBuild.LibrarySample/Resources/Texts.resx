@@ -123,4 +123,7 @@
   <data name="Person" xml:space="preserve">
     <value>Person</value>
   </data>
+  <data name="Revision" xml:space="preserve">
+    <value>Revision</value>
+  </data>
 </root>
