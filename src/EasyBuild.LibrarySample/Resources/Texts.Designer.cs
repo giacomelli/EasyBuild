@@ -77,5 +77,14 @@ namespace EasyBuild.LibrarySample.Resources {
                 return ResourceManager.GetString("Person", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Revision.
+        /// </summary>
+        internal static string Revision {
+            get {
+                return ResourceManager.GetString("Revision", resourceCulture);
+            }
+        }
     }
 }
