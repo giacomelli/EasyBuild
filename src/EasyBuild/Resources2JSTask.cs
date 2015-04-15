@@ -16,247 +16,253 @@ using Microsoft.Build.Utilities;
 
 namespace EasyBuild
 {
-	/// <summary>
-	/// Task to serialize resource files with localized labels to JS files.
-	/// </summary>
-	public class Resources2JSTask : Task
-	{
-		#region Fields
-		private Assembly m_resourcesAssembly;
-		private IList<Type> m_resourceTypes;
-		#endregion
+    /// <summary>
+    /// Task to serialize resource files with localized labels to JS files.
+    /// </summary>
+    public class Resources2JSTask : Task
+    {
+        #region Fields
+        private Assembly m_resourcesAssembly;
+        private IList<Type> m_resourceTypes;
+        #endregion
 
-		#region Constructors
-		/// <summary>
-		/// Initializes a new instance of the <see cref="Resources2JSTask"/> class.
-		/// </summary>
-		public Resources2JSTask()
-		{
-			DefaultCultureCode = "en";
-			IgnoreResourceNames = new string[0];
-			TextNotFoundMarkup = "[TEXT NOT FOUND] ";
-			HtmlEncodeEnabled = true;
-		}
-		#endregion
+        #region Constructors
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Resources2JSTask"/> class.
+        /// </summary>
+        public Resources2JSTask()
+        {
+            DefaultCultureCode = "en";
+            IgnoreResourceNames = new string[0];
+            TextNotFoundMarkup = "[TEXT NOT FOUND] ";
+            HtmlEncodeEnabled = true;
+            SerializationFilename = "Globalizations";
+        }
+        #endregion
 
-		#region Properties
-		/// <summary>
-		/// Gets or sets the filename of the assembly with the resources files.
-		/// </summary>
-		[Required]
-		public string AssemblyFileName { get; set; }
+        #region Properties
+        /// <summary>
+        /// Gets or sets the filename of the assembly with the resources files.
+        /// </summary>
+        [Required]
+        public string AssemblyFileName { get; set; }
 
-		/// <summary>
-		/// Gets or sets the serialization folder where the generated JS files will be writen.
-		/// </summary>
-		[Required]
-		public string SerializationFolder { get; set; }
+        /// <summary>
+        /// Gets or sets the serialization folder where the generated JS files will be writen.
+        /// </summary>
+        [Required]
+        public string SerializationFolder { get; set; }
 
-		/// <summary>
-		/// Gets or sets the list of culture codes to be considered.
-		/// </summary>
-		[Required]
-		public string[] CultureCodes { get; set; }
+        /// <summary>
+        /// Gets or sets the serialization filename where the generated JS files will be writen.
+        /// </summary>
+        public string SerializationFilename { get; set; }
 
-		/// <summary>
-		/// Gets or sets the default culture code.
-		/// </summary>        
-		public string DefaultCultureCode { get; set; }
+        /// <summary>
+        /// Gets or sets the list of culture codes to be considered.
+        /// </summary>
+        [Required]
+        public string[] CultureCodes { get; set; }
 
-		/// <summary>
-		/// Gets or sets the list of resource files that should be ignored.
-		/// </summary>
-		public string[] IgnoreResourceNames { get; set; }
+        /// <summary>
+        /// Gets or sets the default culture code.
+        /// </summary>        
+        public string DefaultCultureCode { get; set; }
 
-		/// <summary>
-		/// Gets or sets the text not found markup.
-		/// </summary>
-		/// <value>
-		/// The text not found markup.
-		/// </value>
-		public string TextNotFoundMarkup { get; set; }
+        /// <summary>
+        /// Gets or sets the list of resource files that should be ignored.
+        /// </summary>
+        public string[] IgnoreResourceNames { get; set; }
 
-		/// <summary>
-		/// Gets or sets a value indicating when [Html Encode Enabled].
-		/// </summary>
-		/// <value>
-		///   <c>true</c> if [Html Encode Enabled]; otherwise, <c>false</c>.
-		/// </value>
-		public bool HtmlEncodeEnabled { get; set; }
-		#endregion
+        /// <summary>
+        /// Gets or sets the text not found markup.
+        /// </summary>
+        /// <value>
+        /// The text not found markup.
+        /// </value>
+        public string TextNotFoundMarkup { get; set; }
 
-		#region Methods
-		/// <summary>
-		/// When overridden in a derived class, executes the task.
-		/// </summary>
-		/// <returns>
-		/// true if the task successfully executed; otherwise, false.
-		/// </returns>
-		public override bool Execute()
-		{
-			// Loads the resource assembly.
-			m_resourcesAssembly = Assembly.LoadFrom(AssemblyFileName);
+        /// <summary>
+        /// Gets or sets a value indicating when [Html Encode Enabled].
+        /// </summary>
+        /// <value>
+        ///   <c>true</c> if html encode is enabled; otherwise, <c>false</c>.
+        /// </value>
+        public bool HtmlEncodeEnabled { get; set; }
+        #endregion
 
-			if (m_resourcesAssembly == null)
-			{
-				throw new InvalidOperationException("Assembly '{0}' not found.".With(AssemblyFileName));
-			}
+        #region Methods
+        /// <summary>
+        /// When overridden in a derived class, executes the task.
+        /// </summary>
+        /// <returns>
+        /// true if the task successfully executed; otherwise, false.
+        /// </returns>
+        public override bool Execute()
+        {
+            // Loads the resource assembly.
+            m_resourcesAssembly = Assembly.LoadFrom(AssemblyFileName);
 
-			Log.LogMessage("Resources assembly: {0} ", m_resourcesAssembly.FullName);
+            if (m_resourcesAssembly == null)
+            {
+                throw new InvalidOperationException("Assembly '{0}' not found.".With(AssemblyFileName));
+            }
 
-			// Find the resource files.
-			var types = m_resourcesAssembly.GetTypes()
-							.Where(t => t.GetProperties(BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public).Any(p => p.PropertyType == typeof(ResourceManager)));
+            Log.LogMessage("Resources assembly: {0} ", m_resourcesAssembly.FullName);
 
-			types = types.Where(t => !IgnoreResourceNames.Any(i => t.Name.ToUpperInvariant().Equals(i)));
-			m_resourceTypes = types.ToList();
-			Log.LogMessage("Resource files found: {0}", String.Join(", ", m_resourceTypes.Select(t => t.Name)));
+            // Find the resource files.
+            var types = m_resourcesAssembly.GetTypes()
+                            .Where(t => t.GetProperties(BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public).Any(p => p.PropertyType == typeof(ResourceManager)));
 
-			ForEachCulture(CreateJSFiles);
+            types = types.Where(t => !IgnoreResourceNames.Any(i => t.Name.ToUpperInvariant().Equals(i)));
+            m_resourceTypes = types.ToList();
+            Log.LogMessage("Resource files found: {0}", String.Join(", ", m_resourceTypes.Select(t => t.Name)));
 
-			return true;
-		}
+            ForEachCulture(CreateJSFiles);
 
-		/// <summary>
-		/// Cria os arquivos JS utilizando a cultura e os resources especificados.
-		/// </summary>
-		[SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope")]
-		private void CreateJSFiles(CultureInfo culture)
-		{
-			Log.LogMessage("Creating JS files for culture '{0}'...", culture.Name);
+            return true;
+        }
 
-			var serializationFilename = "{0}.{1}.js".With(Path.Combine(SerializationFolder, "Globalizations"), culture.Name);
+        /// <summary>
+        /// Cria os arquivos JS utilizando a cultura e os resources especificados.
+        /// </summary>
+        [SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope")]
+        private void CreateJSFiles(CultureInfo culture)
+        {
+            Log.LogMessage("Creating JS files for culture '{0}'...", culture.Name);
 
-			using (var fileStream = new StreamWriter(File.Open(serializationFilename, FileMode.Create, FileAccess.Write), Encoding.UTF8))
-			{
-				ForEachResource((rt, rm) =>
-				{
-					var normalizedResourceName = NormalizePropertyName(rt.Name);
-					fileStream.WriteLine("globalization.{0} = {{", normalizedResourceName);
+            var serializationFullFilename = "{0}.{1}.js".With(Path.Combine(SerializationFolder, SerializationFilename), culture.Name);
 
-					var properties = GetSerializableProperties(rt).ToList();
+            using (var fileStream = new StreamWriter(File.Open(serializationFullFilename, FileMode.Create, FileAccess.Write), Encoding.UTF8))
+            {
+                ForEachResource((rt, rm) =>
+                {
+                    var normalizedResourceName = NormalizePropertyName(rt.Name);
+                    fileStream.WriteLine("globalization.{0} = {{", normalizedResourceName);
 
-					for (int i = 0; i < properties.Count; i++)
-					{
-						var p = properties[i];
-						Log.LogMessage("Serializing property '{0}'...", p.Name);
+                    var properties = GetSerializableProperties(rt).ToList();
 
-						var globalizedText = rm.GetString(p.Name, culture);
+                    for (int i = 0; i < properties.Count; i++)
+                    {
+                        var p = properties[i];
+                        Log.LogMessage("Serializing property '{0}'...", p.Name);
 
-						if (((object)globalizedText) == null)
-						{
-							globalizedText = "{0} {1}".With(TextNotFoundMarkup, p.Name);
-						}
+                        var globalizedText = rm.GetString(p.Name, culture);
 
-						fileStream.Write("  '{0}': '{1}'", NormalizePropertyName(p.Name), NormalizePropertyValue(globalizedText, HtmlEncodeEnabled));
+                        if (((object)globalizedText) == null)
+                        {
+                            globalizedText = "{0} {1}".With(TextNotFoundMarkup, p.Name);
+                        }
 
-						if (i + 1 < properties.Count)
-						{
-							fileStream.WriteLine(",");
-						}
-					}
+                        fileStream.Write("  '{0}': '{1}'", NormalizePropertyName(p.Name), NormalizePropertyValue(globalizedText, HtmlEncodeEnabled));
 
-					fileStream.WriteLine("}};", normalizedResourceName);
-				});
-			}
-		}
+                        if (i + 1 < properties.Count)
+                        {
+                            fileStream.WriteLine(",");
+                        }
+                    }
 
-		/// <summary>
-		/// Normaliza o nome de uma propriedade.
-		/// </summary>
-		/// <returns>O nome da propriedade normalizado.</returns>
-		private static string NormalizePropertyName(string memberName)
-		{
-			return Char.ToLowerInvariant(memberName[0]) + memberName.Substring(1);
-		}
+                    fileStream.WriteLine("}};", normalizedResourceName);
+                });
+            }
+        }
 
-		private static string NormalizePropertyValue(string globalizedText, bool htmlEncodeEnabled)
-		{
-			var result = globalizedText
-											.Replace(Environment.NewLine, "\\n")
-											.Replace("\n", "\\n");
+        /// <summary>
+        /// Normaliza o nome de uma propriedade.
+        /// </summary>
+        /// <returns>O nome da propriedade normalizado.</returns>
+        private static string NormalizePropertyName(string memberName)
+        {
+            return Char.ToLowerInvariant(memberName[0]) + memberName.Substring(1);
+        }
 
-			if (htmlEncodeEnabled)
-			{
-				result = HttpUtility.HtmlEncode(result);
-			}
+        private static string NormalizePropertyValue(string globalizedText, bool htmlEncodeEnabled)
+        {
+            var result = globalizedText
+                                            .Replace(Environment.NewLine, "\\n")
+                                            .Replace("\n", "\\n");
 
-			return result;
-		}
+            if (htmlEncodeEnabled)
+            {
+                result = HttpUtility.HtmlEncode(result);
+            }
 
-		/// <summary>
-		/// Executa a action para cada cultura informada pelo usuário da linha de comando.
-		/// </summary>
-		/// <param name="action">A ação a ser executada.</param>
-		[SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", MessageId = "0")]
-		protected void ForEachCulture(Action<CultureInfo> action)
-		{
-			ExceptionHelper.ThrowIfNull("action", action);
+            return result;
+        }
 
-			var cultures = CultureCodes.Select(c => new CultureInfo(c));
+        /// <summary>
+        /// Executa a action para cada cultura informada pelo usuário da linha de comando.
+        /// </summary>
+        /// <param name="action">A ação a ser executada.</param>
+        [SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", MessageId = "0")]
+        protected void ForEachCulture(Action<CultureInfo> action)
+        {
+            ExceptionHelper.ThrowIfNull("action", action);
 
-			foreach (var culture in cultures)
-			{
-				action(culture);
-			}
-		}
+            var cultures = CultureCodes.Select(c => new CultureInfo(c));
 
-		/// <summary>
-		/// Executa a action para cada resource informado pelo usuário da linha de comando.
-		/// </summary>
-		/// <param name="action">A ação a ser executada.</param>
-		[SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", MessageId = "0")]
-		private void ForEachResource(Action<Type, ResourceManager> action)
-		{
-			ExceptionHelper.ThrowIfNull("action", action);
+            foreach (var culture in cultures)
+            {
+                action(culture);
+            }
+        }
 
-			foreach (var r in m_resourceTypes)
-			{
-				action(r, new ResourceManager(r));
-			}
-		}
+        /// <summary>
+        /// Executa a action para cada resource informado pelo usuário da linha de comando.
+        /// </summary>
+        /// <param name="action">A ação a ser executada.</param>
+        [SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", MessageId = "0")]
+        private void ForEachResource(Action<Type, ResourceManager> action)
+        {
+            ExceptionHelper.ThrowIfNull("action", action);
 
-		/// <summary>
-		/// Obtém as propriedades do resource que serão serializadas.
-		/// </summary>
-		/// <returns>As propriedades que podem ser serializadas.</returns>
-		[SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", MessageId = "0")]
-		private static IEnumerable<PropertyInfo> GetSerializableProperties(Type resourceType)
-		{
-			ExceptionHelper.ThrowIfNull("resourceType", resourceType);
+            foreach (var r in m_resourceTypes)
+            {
+                action(r, new ResourceManager(r));
+            }
+        }
 
-			var properties = resourceType.GetProperties(BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic)
-					.Where(p => p.PropertyType == typeof(string) && !p.Name.Equals("ResourceManager") && !p.Name.Equals("Culture"));
+        /// <summary>
+        /// Obtém as propriedades do resource que serão serializadas.
+        /// </summary>
+        /// <returns>As propriedades que podem ser serializadas.</returns>
+        [SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", MessageId = "0")]
+        private static IEnumerable<PropertyInfo> GetSerializableProperties(Type resourceType)
+        {
+            ExceptionHelper.ThrowIfNull("resourceType", resourceType);
 
-			return properties;
-		}
+            var properties = resourceType.GetProperties(BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic)
+                    .Where(p => p.PropertyType == typeof(string) && !p.Name.Equals("ResourceManager") && !p.Name.Equals("Culture"));
 
-		/// <summary>
-		/// Carrega o arquivo xml do resource informado.
-		/// </summary>
-		/// <param name="resourceFilesFolder">A pasta dos arquivos .resx.</param>
-		/// <param name="resourceType">O tipo do resource.</param>
-		/// <param name="culture">A cultura.</param>
-		/// <returns>O documento xml.</returns>
-		[SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", MessageId = "1"), SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", MessageId = "2"), SuppressMessage("Microsoft.Design", "CA1011:ConsiderPassingBaseTypesAsParameters"), SuppressMessage("Microsoft.Design", "CA1059:MembersShouldNotExposeCertainConcreteTypes", MessageId = "System.Xml.XmlNode")]
-		private XmlDocument LoadResourceXmlFile(string resourceFilesFolder, Type resourceType, CultureInfo culture)
-		{
-			ExceptionHelper.ThrowIfNull("resourceFilesFolder", resourceFilesFolder);
-			ExceptionHelper.ThrowIfNull("resourceType", resourceType);
-			ExceptionHelper.ThrowIfNull("culture", culture);
+            return properties;
+        }
 
-			var xmlDoc = new XmlDocument();
-			var searchPattern = culture.Name.Equals(DefaultCultureCode, StringComparison.OrdinalIgnoreCase) ? "{0}.resx" : "{0}.{1}.resx";
-			var files = Directory.GetFiles(resourceFilesFolder, searchPattern.With(resourceType.Name, culture.Name));
+        /// <summary>
+        /// Carrega o arquivo xml do resource informado.
+        /// </summary>
+        /// <param name="resourceFilesFolder">A pasta dos arquivos .resx.</param>
+        /// <param name="resourceType">O tipo do resource.</param>
+        /// <param name="culture">A cultura.</param>
+        /// <returns>O documento xml.</returns>
+        [SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", MessageId = "1"), SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", MessageId = "2"), SuppressMessage("Microsoft.Design", "CA1011:ConsiderPassingBaseTypesAsParameters"), SuppressMessage("Microsoft.Design", "CA1059:MembersShouldNotExposeCertainConcreteTypes", MessageId = "System.Xml.XmlNode")]
+        private XmlDocument LoadResourceXmlFile(string resourceFilesFolder, Type resourceType, CultureInfo culture)
+        {
+            ExceptionHelper.ThrowIfNull("resourceFilesFolder", resourceFilesFolder);
+            ExceptionHelper.ThrowIfNull("resourceType", resourceType);
+            ExceptionHelper.ThrowIfNull("culture", culture);
 
-			if (files.Length > 0)
-			{
-				xmlDoc.Load(files[0]);
-			}
+            var xmlDoc = new XmlDocument();
+            var searchPattern = culture.Name.Equals(DefaultCultureCode, StringComparison.OrdinalIgnoreCase) ? "{0}.resx" : "{0}.{1}.resx";
+            var files = Directory.GetFiles(resourceFilesFolder, searchPattern.With(resourceType.Name, culture.Name));
 
-			return xmlDoc;
-		}
-		#endregion
-	}
+            if (files.Length > 0)
+            {
+                xmlDoc.Load(files[0]);
+            }
+
+            return xmlDoc;
+        }
+        #endregion
+    }
 }
 #endif
