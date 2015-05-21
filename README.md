@@ -58,6 +58,7 @@ Create a file called .Resources2JSTask.targets on your msbuilds file folder (if 
     		<Resources2JSTask 
     			assemblyFileName="..\<YOUR PROJECT WITH RESOURCE FILE>\bin\$(configuration)\<YOUR PROJECT WITH RESOURCE FILE>.dll" 
     			serializationFolder="..\<YOUR WEB PROJECT>Scripts\Framework\Globalization"
+    			serializationFilename="<YOUR DESIRED FILE NAME>"
     			cultureCodes="pt,es,en"
     			defaultCultureCode="en" />
 
