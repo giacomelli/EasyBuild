@@ -1,12 +1,11 @@
-#EasyBuild
-[![Build Status](https://travis-ci.org/giacomelli/EasyBuild.png?branch=master)](https://travis-ci.org/giacomelli/EasyBuild)
+# EasyBuild
 
 An easy-to-use collection of MS Build tasks to help improve your build process.
 
 
 --------
 
-##Tasks
+## Tasks
 ===
  - **StartWebProjectTask**: when you need to start some one of your web projects during the build process (useful to generate some client library for your web apis).
 
@@ -14,17 +13,17 @@ An easy-to-use collection of MS Build tasks to help improve your build process.
  
 --------
 
-##Usage
+## Usage
 Follow the steps below to put EasyBuild on your solution. 
 On Step 3 you can choose just the tasks you want to use.
 
-###Step 1
+### Step 1
 Build the EasyBuild, put his assembly and dependencies assemblies in a folder on your solution, let me say "references\EasyBuild"
 
-###Step 2
+### Step 2
 If you don't jhave a folder to your msbuild files, just create one "msbuilds" folder on your solution root folder.
 
-###Step 3
+### Step 3
 StartWebProjectTask
 ---
 Create a file called StartMyWebProject.targets on your msbuilds folder:
@@ -68,7 +67,7 @@ Create a file called .Resources2JSTask.targets on your msbuilds file folder (if 
 
 ```
 
-###Step 4
+### Step 4
 Edit the target project file that you want use the task, and add the following line bellow the "Microsoft.CSharp.targets" one:
 
 ```xml
@@ -76,7 +75,7 @@ Edit the target project file that you want use the task, and add the following l
 
 ```
 
-###Step 5
+### Step 5
 Build your target project to see the task in action.
 
 FAQ
@@ -103,8 +102,3 @@ License
 
 Licensed under the The MIT License (MIT).
 In others words, you can use this library for developement any kind of software: open source, commercial, proprietary and alien.
-
-
-Change Log
-======
- - 0.1.0 First version.
